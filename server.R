@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
   output$participantID_reminder <- renderText({
   
       return(
-        paste0("<h4>Reminder: you entered the following participant ID is: </h4><h2>",input$id,"</h2><h4><br><b>PLEASE WRITE THIS DOWN</b>, you need the participant ID for the next measurement, and due to the annonymous nature of our research we won't know your participant number ourselves.</h4>")    
+        paste0("<h4>Reminder: you entered the following participant ID: </h4><h2>",input$id,"</h2><h4><br><b>PLEASE WRITE THIS DOWN</b>, you need the participant ID for the next measurement, and due to the annonymous nature of our research we won't know your participant number ourselves.</h4>")    
       )
 
   })

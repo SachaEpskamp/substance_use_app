@@ -120,15 +120,16 @@ shinyUI(fluidPage(
              
              
              
-             tabPanel("final",
+             tabPanel("Final",
                       value = "panel6",
                       h4("Thank you for participating in this research! Please press the button below to submit your responses."),
                       
+                      
+                      htmlOutput("participantID_reminder"),
+                      
                       actionButton(inputId = "submitbutton", label = "SUBMIT RESPONSES"),
                       
-                      htmlOutput("submitted"),
-                      
-                      htmlOutput("participantID_reminder")
+                      htmlOutput("submitted")
                       
              )
              

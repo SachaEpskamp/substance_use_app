@@ -37,23 +37,18 @@ shinyServer(function(input, output, session) {
       use <- c(LETTERS,0:9)
       use <- use[!use %in% c(0,1,"O","I")]
       return(
-        paste0("<h4>Your participant ID is: </h4><h2>",paste0(sample(use,6,TRUE),collapse=""),"</h2><h4><br><b>PLEASE WRITE THIS DOWN</b>, you need the participant ID for the next measurement, and due to the annonymous nature of our research we won't know your participant number ourselves.</h4>")    
+        paste0("<h4>Generated participant ID: </h4><h2>",paste0(sample(use,6,TRUE),collapse=""))    
       )
     }
     
   })
   
   output$participantID_reminder <- renderText({
-    if (input$createID == 0){
-      return("")
-    } else {
-      use <- c(LETTERS,0:9)
-      use <- use[!use %in% c(0,1,"O","I")]
+  
       return(
         paste0("<h4>Reminder: you entered the following participant ID is: </h4><h2>",input$id,"</h2><h4><br><b>PLEASE WRITE THIS DOWN</b>, you need the participant ID for the next measurement, and due to the annonymous nature of our research we won't know your participant number ourselves.</h4>")    
       )
-    }
-    
+
   })
   
   # Button to go to Q1:
@@ -74,8 +69,16 @@ shinyServer(function(input, output, session) {
   
   # Button to Q2:
   
+  output$buttonToQ2 <- renderUI({
+    if (sum(!is.na(vals_alc$y))>1){
+      return(
+        actionButton(inputId = "nextpanel2", label = "Go to question 2")
+      )
+    }
+  })
+  
   # Action go to Q2:
-  observeEvent(input$buttonToQ2, {
+  observeEvent(input$nextpanel2, {
     updateTabsetPanel(session, "PREMISE",
                       selected = "panel3")
   })
@@ -83,12 +86,33 @@ shinyServer(function(input, output, session) {
   
   
   # Action go to Q3:
-  observeEvent(input$buttonToQ3, {
+  output$buttonToQ3 <- renderUI({
+    if (sum(!is.na(vals_mar$y))>1){
+      return(
+        actionButton(inputId = "nextpanel3", label = "Go to question 3")
+      )
+    }
+  })
+  
+  
+  observeEvent(input$nextpanel3, {
     updateTabsetPanel(session, "PREMISE",
                       selected = "panel4")
   })
   
-  observeEvent(input$buttonToQ4, {
+  
+  
+  # Go to Q4:
+  
+  output$buttonToQ4 <- renderUI({
+    if (sum(!is.na(vals_lon$y))>1){
+      return(
+        actionButton(inputId = "nextpanel4", label = "Go to question 4")
+      )
+    }
+  })
+  
+  observeEvent(input$nextpanel4, {
     updateTabsetPanel(session, "PREMISE",
                       selected = "panel5")
   })
@@ -114,7 +138,6 @@ shinyServer(function(input, output, session) {
 
     temp_alc <- draw_alc(); draw_alc(!temp_alc)
     # if(!draw_alc()) {
-    #   browser()
     #   vals_alc$x <- c(vals_alc$x, NA)
     #   vals_alc$y <- c(vals_alc$y, NA)
     # }
@@ -268,7 +291,7 @@ shinyServer(function(input, output, session) {
   observeEvent(input$hover_lon, {
     
     vals_lon_hover$x <- pmin(pmax(round(input$hover_lon$x),2010),2020)
-    vals_lon_hover$y <- pmin(1,pmax(-1,input$hover_lon$y))
+    vals_lon_hover$y <- pmin(1,pmax(-1,round(input$hover_lon$y,2)))
    
     # Hover values:
     
@@ -312,24 +335,69 @@ shinyServer(function(input, output, session) {
   
   
   ### Download data ###
+  observeEvent(input$submitbutton,{
+    
+    # Collect the user ID:
+    ID <- input$id
+    
+    # collect the life events:
+    years <- 2010:2020
+    life_event <- years %in% as.numeric(input$liveevents)
+    
+    # Collect the alcohol responses:
+    df_alc <- data.frame(
+      ID = ID,
+      question = "alcohol",
+      time = Sys.time(),
+      x = years,
+      y = NA,
+      life_event = life_event
+    )
+    y <- vals_alc$y[match(df_alc$x,vals_alc$x)]
+    df_alc$y <- round(approx(df_alc$x[!is.na(y)],y[!is.na(y)],xout=df_alc$x)$y,2)
+    
+    # Collect marijuana responses:
+    df_mar <- data.frame(
+      ID = ID,
+      question = "marijuana",
+      time = Sys.time(),
+      x = years,
+      y = NA,
+      life_event = life_event
+    )
+    y <- vals_mar$y[match(df_mar$x,vals_mar$x)]
+    df_mar$y <- round(approx(df_mar$x[!is.na(y)],y[!is.na(y)],xout=df_mar$x)$y,2)
+    
+    # Collect loneliness responses:
+    df_lon <- data.frame(
+      ID = ID,
+      question = "loneliness",
+      time = Sys.time(),
+      x = years,
+      y = NA,
+      life_event = life_event
+    )
+    y <- vals_lon$y[match(df_lon$x,vals_lon$x)]
+    df_lon$y <- approx(df_lon$x[!is.na(y)],y[!is.na(y)],xout=df_lon$x)$y
+    
+    # Combine them all:
+    df <- rbind(
+      df_alc,
+      df_mar,
+      df_lon
+    )
+    
+    # Write file:
+    write.csv(df, row.names=FALSE, file = paste0("/data/bachelor_projects/data/",format(Sys.time(), format = "%Y_%m_%d_%H_%M_%S"),"_",ID,".csv"))
+  })
   
-  output$downloadData <- downloadHandler(
-    filename = function() {
-      paste0("data-",input$userid, format(Sys.time(), format = "%Y-%m-%d--%H-%M-%S"), ".csv", sep="")
-    },
-    content = function(file) {
-      # Make data frame:
-      df <- expand.grid(
-        id = input$userid,
-        time = Sys.time(),
-        x = 0:100,
-        y = NA
-      )
-      y <- vals$y[match(df$x,vals$x)]
-      df$y <- round(approx(df$x[!is.na(y)],y[!is.na(y)],xout=df$x)$y,2)
-      write.csv(df, file)
+  # Submitted response:
+  output$submitted <- renderText({
+    if (input$submitbutton > 0){
+      '<p style = "color:red">Your responses have been submitted! You can now close this window.</p>'
+    } else {
+      return("")
     }
-  )
-  
+  })
   
 })

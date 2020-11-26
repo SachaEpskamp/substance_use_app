@@ -56,7 +56,7 @@ shinyUI(fluidPage(
              
              tabPanel("Participant ID",
                       value = "panel1",
-                      h4("If this is the first time you use this app, please generate a participant id here:"),
+                      h4("If this is the first time you use this app, please generate a participant id here. If you do not have a participant ID, you can generate a random ID below, or think of your own ID you can renember (for example, your date of birth coupled with your lucky number)."),
                       actionButton("createID", "Generate a participant ID"),
                       htmlOutput("participantID"),
                       tags$br(),
@@ -74,8 +74,8 @@ shinyUI(fluidPage(
                                  hover=hoverOpts(id = "hover_alc", delay = 100, delayType = "throttle", clip = TRUE, nullOutside = TRUE),
                                  click="click_alc"),
                       actionButton("reset_alc", "RESET DRAWING"),
-                      
-                      actionButton(inputId = "buttonToQ2", label = "To the next question")
+                      br(), br(),
+                      uiOutput("buttonToQ2")
                       ),
              
              
@@ -89,8 +89,8 @@ shinyUI(fluidPage(
                                  hover=hoverOpts(id = "hover_mar", delay = 100, delayType = "throttle", clip = TRUE, nullOutside = TRUE),
                                  click="click_mar"),
                       actionButton("reset_mar", "RESET DRAWING"),
-                      
-                      actionButton(inputId = "buttonToQ3", label = "To the next question")
+                      br(), br(),
+                      uiOutput("buttonToQ3")
                       ),
              
              
@@ -104,8 +104,8 @@ shinyUI(fluidPage(
                                  hover=hoverOpts(id = "hover_lon", delay = 100, delayType = "throttle", clip = TRUE, nullOutside = TRUE),
                                  click="click_lon"),
                       actionButton("reset_lon", "RESET DRAWING"),
-                      
-                      actionButton(inputId = "buttonToQ4", label = "To the next question")
+                      br(), br(),
+                      uiOutput("buttonToQ4")
              ),
              
              
@@ -114,7 +114,7 @@ shinyUI(fluidPage(
                       h4("A negative life event can be defined as a sudden, acute, undesirable experience that is limited in duration (Adkins et al. 2009)."),
                       
                       checkboxGroupInput("liveevents","To your best recall, did you experience a negative life event in the year...",choices = 2010:2020),
-                      
+                      br(), br(),
                       actionButton(inputId = "buttonToEnd", label = "To last page")
              ),
              
@@ -125,6 +125,8 @@ shinyUI(fluidPage(
                       h4("Thank you for participating in this research! Please press the button below to submit your responses."),
                       
                       actionButton(inputId = "submitbutton", label = "SUBMIT RESPONSES"),
+                      
+                      htmlOutput("submitted"),
                       
                       htmlOutput("participantID_reminder")
                       

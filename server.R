@@ -355,7 +355,7 @@ shinyServer(function(input, output, session) {
     )
     y <- vals_alc$y[match(df_alc$x,vals_alc$x)]
     df_alc$y <- round(approx(df_alc$x[!is.na(y)],y[!is.na(y)],xout=df_alc$x)$y,2)
-    df_alc$y <- ifelse(df_alc$y > 50, "> 50", 50)
+    df_alc$y <- ifelse(df_alc$y > 50, "> 50", df_alc$y)
     
     # Collect marijuana responses:
     df_mar <- data.frame(
@@ -368,7 +368,7 @@ shinyServer(function(input, output, session) {
     )
     y <- vals_mar$y[match(df_mar$x,vals_mar$x)]
     df_mar$y <- round(approx(df_mar$x[!is.na(y)],y[!is.na(y)],xout=df_mar$x)$y,2)
-    df_alc$y <- ifelse(df_alc$y > 10, "> 10", 10)
+    df_mar$y <- ifelse(df_mar$y > 10, "> 10", df_mar$y)
     
     # Collect loneliness responses:
     df_lon <- data.frame(
@@ -388,6 +388,7 @@ shinyServer(function(input, output, session) {
       df_mar,
       df_lon
     )
+
 
     # Write file:
     write.csv(df, row.names=FALSE, file = paste0("/data/bachelor_projects/data/",format(Sys.time(), format = "%Y_%m_%d_%H_%M_%S"),"_",ID,".csv"))

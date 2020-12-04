@@ -3,7 +3,7 @@ shinyServer(function(input, output, session) {
   # Page 1 info:
   output$hometext0 <- renderText({
     paste("<h4>", input$foo,
-          "Dear Participant,<br><br>Thank you for showing interest in our research!<br><br>In the following, you will be asked to recall patterns of drug use and loneliness of the past 10 years. Please be as honest and truthful as possible.<br><br>For negative life events, please click one answer option per year. Please remember that you do not have to have experience with drug use and/ or loneliness and/or negative life events in order to be able to participate. You can always indicate that.<br><br>In case you do not want to continue, you can always stop participating or ask to withdraw your data without giving reasons for doing so.",
+          "Dear Participant,<br><br>Thank you for showing interest in our research!<br><br>In the following, you will be asked to recall patterns of drug use and loneliness of the past 10 years. Please be as honest and truthful as possible. Data will be completely anonymous. We cannot link your email address to the responses you give in the following.<br><br>Indicate whether you have had a negative life event in the given years. Please remember that you do not have to have experience with drug use and/ or loneliness and/or negative life events in order to be able to participate. You can always indicate that.<br><br>In case you do not want to continue, you can always stop participating or ask to withdraw your data without giving reasons for doing so.",
           "</h4>")
   })
  
@@ -223,8 +223,8 @@ shinyServer(function(input, output, session) {
     
     vals_mar_hover$x <- pmin(pmax(round(input$hover_mar$x),2010),2020)
     vals_mar_hover$y <- pmax(0,round(input$hover_mar$y))
-    if (vals_mar_hover$y > 50){
-      vals_mar_hover$y <- 55
+    if (vals_mar_hover$y > 10){
+      vals_mar_hover$y <- 11
     }
     
     # Hover values:
@@ -248,17 +248,17 @@ shinyServer(function(input, output, session) {
   
   output$plot_mar <- renderPlot({
     par(cex = 1.5, mar = c(5,6,2,2))
-    plot(x=vals_mar$x, y=vals_mar$y, xlim=c(2010, 2020), ylim=c(0, 55), ylab="Amount of units per week", xlab="", type="l", lwd=2, xaxt="n", yaxt = "n")
+    plot(x=vals_mar$x, y=vals_mar$y, xlim=c(2010, 2020), ylim=c(0, 11), ylab="Amount of units per week", xlab="", type="l", lwd=2, xaxt="n", yaxt = "n")
     axis(1, at = seq(2010,2020,by=1), las=2)
-    axis(2, at = c(seq(0,50,by=5),55),labels = c(seq(0,50,by=5),"> 50"), las=2)
+    axis(2, at = c(seq(0,10,by=1),11),labels = c(seq(0,10,by=1),"> 10"), las=2)
     
     if (!is.na(vals_mar_hover$x) && !is.na(vals_mar_hover$y) &&
         vals_mar_hover$x > par("usr")[1] && vals_mar_hover$x < par("usr")[2] &&
         vals_mar_hover$y > par("usr")[3] && vals_mar_hover$y < par("usr")[4]){
       
       usage <- vals_mar_hover$y
-      if (usage == 55){
-        usage <- "> 50"
+      if (usage == 11){
+        usage <- "> 10"
       }
       text(par("usr")[1] + 0.01 * (par("usr")[2]-par("usr")[1]),par("usr")[4] - 0.01 * (par("usr")[4]-par("usr")[3]),paste0("Year: ",vals_mar_hover$x,"; amount: ",usage),adj = c(0,1))  
     }
@@ -355,6 +355,7 @@ shinyServer(function(input, output, session) {
     )
     y <- vals_alc$y[match(df_alc$x,vals_alc$x)]
     df_alc$y <- round(approx(df_alc$x[!is.na(y)],y[!is.na(y)],xout=df_alc$x)$y,2)
+    df_alc$y <- ifelse(df_alc$y > 50, "> 50", 50)
     
     # Collect marijuana responses:
     df_mar <- data.frame(
@@ -367,6 +368,7 @@ shinyServer(function(input, output, session) {
     )
     y <- vals_mar$y[match(df_mar$x,vals_mar$x)]
     df_mar$y <- round(approx(df_mar$x[!is.na(y)],y[!is.na(y)],xout=df_mar$x)$y,2)
+    df_alc$y <- ifelse(df_alc$y > 10, "> 10", 10)
     
     # Collect loneliness responses:
     df_lon <- data.frame(
@@ -386,7 +388,7 @@ shinyServer(function(input, output, session) {
       df_mar,
       df_lon
     )
-    
+
     # Write file:
     write.csv(df, row.names=FALSE, file = paste0("/data/bachelor_projects/data/",format(Sys.time(), format = "%Y_%m_%d_%H_%M_%S"),"_",ID,".csv"))
   })

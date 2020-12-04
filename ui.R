@@ -56,7 +56,7 @@ shinyUI(fluidPage(
              
              tabPanel("Participant ID",
                       value = "panel1",
-                      h4("If this is the first time you use this app, please generate a participant id here. If you do not have a participant ID, you can generate a random ID below, or think of your own ID you can renember (for example, your date of birth coupled with your lucky number)."),
+                      h4("If this is the first time you use this app, please generate a participant ID here. If you do not have a participant ID, you can generate a random ID below, or think of your own ID you can remember (for example, your date of birth coupled with your lucky number). If this is the second time you are using this app, please do not generate a new one but use the same participant ID as the last time"),
                       actionButton("createID", "Generate a participant ID"),
                       htmlOutput("participantID"),
                       tags$br(),
@@ -83,7 +83,7 @@ shinyUI(fluidPage(
              tabPanel("Q2",
                       value = "panel3",
                       h4("To your best recall, indicate how often you used cannabis per week in the past 10 years."),
-                      p("You can draw a line in the drawing area below by clicking once and dragging the mouse across the window from LEFT to RIGHT. Once you have finished, click again. You can reset the drawing as many times as you want to. Only your final version will be considered."),
+                      p("You can draw a line in the drawing area below by clicking once and dragging the mouse across the window from LEFT to RIGHT. Once you have finished, click again. You can reset the drawing as many times as you want to. Only your final version will be considered. One unit is defined as (for example) one joint."),
                       # sliderInput("mywidth", "width of the pencil", min=1, max=30, step=1, value=10),
                       plotOutput("plot_mar", width = "800px", height = "500px",
                                  hover=hoverOpts(id = "hover_mar", delay = 100, delayType = "throttle", clip = TRUE, nullOutside = TRUE),
@@ -123,6 +123,7 @@ shinyUI(fluidPage(
              tabPanel("Final",
                       value = "panel6",
                       h4("Thank you for participating in this research! Please press the button below to submit your responses."),
+                      p("By clicking the submit button, you confirm your agreement to the terms as stated in the informed consent form (via Google Forms)."),
                       
                       
                       htmlOutput("participantID_reminder"),
